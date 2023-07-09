@@ -1,9 +1,9 @@
 {
     "schema_version": "v1",
-    "name_for_human": "TODO List (no auth)",
-    "name_for_model": "todo",
-    "description_for_human": "Manage your TODO list. You can add, remove and view your TODOs.",
-    "description_for_model": "Plugin for managing a TODO list, you can add, remove and view your TODOs.",
+    "name_for_human": "Airports for France (no auth)",
+    "name_for_model": "fr_airports",
+    "description_for_human": "Find airports in France",
+    "description_for_model": "Plugin for to find airports and calculate distances in France",
     "auth": {
       "type": "none"
     },
