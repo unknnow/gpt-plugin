@@ -10,6 +10,7 @@ class Airport:
     def __init__(self, row):
         self.name = row["name"]
         self.ident = row["ident"]
+        self.type = row["type"]
         self.latitude_deg = float(row["latitude_deg"])
         self.longitude_deg = float(row["longitude_deg"])
         self.wikipedia_link = row["wikipedia_link"]
@@ -18,6 +19,7 @@ class Airport:
         return {
             'name': self.name,
             'ident': self.ident,
+            'type': self.type,
             'lat': self.latitude_deg,
             'long': self.longitude_deg,
             'url': self.wikipedia_link
@@ -26,7 +28,7 @@ class Airport:
 def load_airports_from_csv(file):
     airports = []
 
-    with open(file, 'r') as csv_file:
+    with open(file, 'r', encoding="utf8") as csv_file:
         csv_reader = csv.DictReader(csv_file)
 
         for row in csv_reader:
@@ -34,17 +36,19 @@ def load_airports_from_csv(file):
 
     return airports
 
-airports = load_airports_from_csv("data/fr-airports.csv")
+airports = load_airports_from_csv("data/airports.csv")
 
-def find_nearest_airports(lat, long, count):
-    return sorted(airports, key=lambda a: math.sqrt((a.latitude_deg - lat)**2 + (a.longitude_deg - long)**2))[:count]
+def filter_type_airports(filtered_type):
+    return [a for a in airports if a.type is None or (a.type and filtered_type in a.type)]
+
+def find_nearest_airports(lat, long, count, type):
+    return sorted(filter_type_airports(type), key=lambda a: (math.sqrt((a.latitude_deg - lat)**2 + (a.longitude_deg - long)**2)))[:count]
 
 def search_airports_by_name(city_name):
     return [a for a in airports if city_name.lower() in a.name.lower()]
 
 def search_airports_by_ident(ident):
     return [a for a in airports if ident.lower() in a.ident.lower()]
-
 
 def generate_flight_plan_link(coordinates):
     # Convert the coordinates to the format expected by the SkyVector URL
@@ -82,9 +86,12 @@ def generate_flight_plan_link(coordinates):
 
 app = quart_cors.cors(quart.Quart(__name__), allow_origin="https://chat.openai.com")
 
-@app.get("/nearestAirports/<float:lat>/<float:long>/<int:count>")
-async def nearest_airports(lat, long, count):
-    result = find_nearest_airports(lat, long, count)
+@app.get("/nearestAirports/<float:lat>/<float:long>")
+async def nearest_airports(lat, long):
+    count = int(request.args.get("count", 5))
+    airport_type = request.args.get("type", None)
+
+    result = find_nearest_airports(lat, long, count, airport_type)
 
     return jsonify([r.to_json() for r in result])
 

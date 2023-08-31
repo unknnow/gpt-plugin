@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:5003
 paths:
-  /nearestAirports/{lat}/{long}/{count}:
+  /nearestAirports/{lat}/{long}:
     get:
       operationId: findNearestAirports
       summary: Find the nearest airports by latitude and longitude
@@ -25,12 +25,18 @@ paths:
             format: double
           required: true
           description: The longitude of the location
-        - in: path
+        - in: query
           name: count
           schema:
             type: integer
-          required: true
-          description: The number of nearest airports to return
+          required: false
+          description: The number of nearest airports to return. Default is 5
+        - in: query
+          name: type
+          schema:
+            type: string
+          required: false
+          description: Type of airports to return ("airport", "heliport", "seaplane", "balloon" or "closed").
       responses:
         '200':
           description: A list of the nearest airports
