@@ -89,7 +89,7 @@ app = quart_cors.cors(quart.Quart(__name__), allow_origin="https://chat.openai.c
 @app.get("/nearestAirports/<float:lat>/<float:long>")
 async def nearest_airports(lat, long):
     count = int(request.args.get("count", 5))
-    airport_type = request.args.get("type", None)
+    airport_type = request.args.get("type", "airport")
 
     result = find_nearest_airports(lat, long, count, airport_type)
 
